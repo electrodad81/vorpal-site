@@ -1,0 +1,135 @@
+{
+  "meta": { "title": "Bench Test World", "start_room": 1 },
+
+  "rooms": {
+    "1": {
+      "id": 1,
+      "name": "Park Bench",
+      "desc_short": "A quiet park bench beneath a gingko tree. Someone is reading nearby.",
+      "desc_long": "A gentle breeze skims the leaves. East is a small kiosk. A shy reader sits a careful distance away.",
+      "desc_overrides": [
+        {
+          "visible_if_flags": ["rin_acquainted"],
+          "short": "Rin glances up from the paperback, warmer than before.",
+          "long": "Rin marks their place with a leaf. The air between you feels easier now."
+        },
+        {
+          "visible_if_flags": ["rin_affection_15plus"],
+          "short": "Rin shifts closer on the bench, comfortable in your company.",
+          "long": "The gingko shadows fall across you both. Conversation returns to shared jokes."
+        }
+      ],
+      "exits": { "east": { "to": 2 } },
+      "interactions": [
+        {
+          "id": "approach_rin",
+          "label": "Approach the reader",
+          "sort": -10,
+          "visible_if_not_flags": ["rin_approached"],
+          "effects": [
+            { "add_flag": "rin_approached" },
+            { "add_flag": "rin_respect_1plus" }
+          ],
+          "after_text": "You approach slowly. The reader lowers the book a fraction, attentive but reserved."
+        },
+        {
+          "id": "greet",
+          "label": "Say hello",
+          "visible_if_flags": ["rin_approached"],
+          "effects": [
+            { "add_flag": "rin_trust_1plus" },
+            { "add_flag": "rin_affection_1plus" },
+            { "add_flag": "rin_acquainted" }
+          ],
+          "after_text": "“Hi.” A brief smile; a thumb holds their place in the book."
+        },
+        {
+          "id": "talk_books",
+          "label": "Ask about their book",
+          "visible_if_flags": ["rin_acquainted"],
+          "effects": [
+            { "add_flag": "rin_trust_3plus" },
+            { "add_flag": "rin_affection_3plus" },
+            { "add_flag": "rin_shared_hobby_chat" },
+            { "remove_flag": "rin_affection_15plus" },
+            { "remove_flag": "rin_affection_10plus" },
+            { "remove_flag": "rin_affection_5plus" },
+            { "add_flag": "rin_affection_5plus" }
+          ],
+          "after_text": "They light up—gentle mysteries and messy marginalia are favorites."
+        },
+        {
+          "id": "light_compliment",
+          "label": "Offer a light compliment",
+          "visible_if_flags": ["rin_trust_1plus"],
+          "effects": [
+            { "add_flag": "rin_affection_2plus" },
+            { "remove_flag": "rin_affection_15plus" },
+            { "remove_flag": "rin_affection_10plus" },
+            { "remove_flag": "rin_affection_5plus" },
+            { "add_flag": "rin_affection_10plus" }
+          ],
+          "after_text": "You compliment their laugh; they look away, smiling."
+        },
+        {
+          "id": "flirt_forward",
+          "label": "Flirt (a bit forward)",
+          "visible_if_flags": ["rin_trust_1plus", "rin_respect_1plus", "rin_affection_10plus"],
+          "effects": [
+            { "add_flag": "rin_friend" },
+            { "remove_flag": "rin_affection_15plus" },
+            { "add_flag": "rin_affection_15plus" }
+          ],
+          "after_text": "There’s a spark; they don’t look away this time."
+        },
+        {
+          "id": "apologize",
+          "label": "Apologize (if you pushed too far)",
+          "visible_if_flags": ["rin_boundary_crossed"],
+          "effects": [
+            { "remove_flag": "rin_boundary_crossed" },
+            { "add_flag": "rin_trust_1plus" },
+            { "add_flag": "rin_respect_1plus" }
+          ],
+          "after_text": "You take responsibility. Tension eases."
+        }
+      ]
+    },
+
+    "2": {
+      "id": 2,
+      "name": "Park Kiosk",
+      "desc_short": "A kiosk selling tea and paper-wrapped wildflowers.",
+      "desc_long": "The vendor arranges fresh bundles. West leads back to the bench.",
+      "exits": { "west": { "to": 1 } },
+      "items": [
+        {
+          "id": "wildflowers",
+          "name": "Wildflower bundle",
+          "takeable": true,
+          "desc": "Gingko, aster, and something sweet."
+        }
+      ],
+      "interactions": [
+        {
+          "id": "buy_flowers",
+          "label": "Buy a wildflower bundle",
+          "visible_if_not_items": ["wildflowers"],
+          "effects": [{ "add_item": "wildflowers" }],
+          "after_text": "You purchase a fragrant bundle."
+        },
+        {
+          "id": "give_flowers",
+          "label": "Give flowers to the reader (from the bench)",
+          "visible_if_items": ["wildflowers"],
+          "effects": [
+            { "remove_item": "wildflowers" },
+            { "add_flag": "rin_affection_10plus" },
+            { "add_flag": "rin_trust_1plus" }
+          ],
+          "after_text": "You head back with the bundle in mind."
+        }
+      ]
+    }
+  }
+}

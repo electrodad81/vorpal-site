@@ -1,0 +1,684 @@
+{
+  "title": "Escape House - Medium",
+  "start_room": "1",
+  "items": {
+    "hatchet": {
+      "id": "hatchet",
+      "name": "Hatchet",
+      "desc": "A small hatchet with a chipped edge—good for prying."
+    },
+    "corn_kernels": {
+      "id": "corn_kernels",
+      "name": "Corn Kernels",
+      "desc": "A handful of dry kernels—perfect for tempting a hungry crow."
+    },
+    "rusty_key": {
+      "id": "rusty_key",
+      "name": "Rusty Key",
+      "desc": "Old and pitted, but the bitting still looks serviceable."
+    },
+    "lantern": {
+      "id": "lantern",
+      "name": "Lantern",
+      "desc": "An old metal lantern. It’s bone-dry."
+    },
+    "oil_flask": {
+      "id": "oil_flask",
+      "name": "Oil Flask",
+      "desc": "A small flask of lamp oil."
+    },
+    "fueled_lantern": {
+      "id": "fueled_lantern",
+      "name": "Fueled Lantern",
+      "desc": "Filled with oil. The wick takes a steady flame."
+    },
+    "final_escape_key": {
+      "id": "final_escape_key",
+      "name": "Brass House Key",
+      "desc": "A solid brass key with a round bow—heavier than it looks."
+    },
+    "poster_rules": {
+      "id": "poster_rules",
+      "name": "Tacked Poster",
+      "desc": "A black-and-white poster titled “House Rules.”\n\n• Explore with LOOK.\n• Examine things to reveal actions.\n• Some actions appear only after LOOK.\n• Items can combine (e.g., oil + lantern).\n• Death is possible; choose carefully.\n• Escape by unlocking the front door."
+    }
+  },
+  "global_interactions": [
+    {
+      "id": "fuel_lantern_global",
+      "label": "Fuel the lantern with oil",
+      "visible_if_items": [
+        "lantern",
+        "oil_flask"
+      ],
+      "visible_if_not_items": [
+        "fueled_lantern"
+      ],
+      "once": true,
+      "sort": -5,
+      "effects": [
+        {
+          "remove_item": "lantern"
+        },
+        {
+          "remove_item": "oil_flask"
+        },
+        {
+          "add_item": "fueled_lantern"
+        },
+        {
+          "add_flag": "lantern_fueled"
+        }
+      ],
+      "text": "You pour the oil, prime the wick, and strike a spark. A steady flame blooms inside the glass."
+    }
+  ],
+  "rooms": {
+    "1": {
+      "id": "1",
+      "name": "Living Room",
+      "desc_short": "A cramped living room with a jammed front door and a dusty desk.",
+      "desc_long": "A sagging couch, a dead TV, and a dusty desk tucked under the window. The front door looks swollen and stuck. A staircase leads down. Doorways lead to the Kitchen and Backyard. A tacked poster hangs on the wall.",
+      "desc_overrides": [
+        {
+          "visible_if_flags": ["poster_taken"],
+          "short": "A cramped living room; empty tacks mark where a poster hung.",
+          "long": "A sagging couch, a dead TV, and a dusty desk tucked under the window. Empty tacks dot the wall where a poster once hung. The front door looks swollen and stuck. A staircase leads down. Doorways lead to the Kitchen and Backyard."
+        },
+        {
+          "priority": 50,
+          "visible_if_flags": ["trapdoor_pried", "lantern_fueled"],
+          "short": "A cramped living room with scuffed floors. The note on the desk seems irrelevant now.",
+          "long": "A sagging couch, a dead TV, and a dusty desk tucked under the window. The folded note sits where you left it, but after exploring below the shed, its warning feels unnecessary."
+        }
+      ],
+      "exits": {
+        "north": {
+          "to": "3",
+          "label": "the front door",
+          "locked_by_flag": "front_door_unlocked",
+          "locked_text": "The front door is jammed. A brass key would help."
+        },
+        "south": { "to": "5", "label": "to the kitchen" },
+        "down":  { "to": "2", "label": "to the basement" },
+        "west":  { "to": "4", "label": "to the backyard" }
+      },
+      "interactions": [
+        {
+          "id": "look_desk",
+          "label": "Examine the desk",
+          "once": true,
+          "effects": [{ "add_flag": "look_desk" }],
+          "text": "The desk’s top drawer is locked. A folded note sits just inside, visible through a gap."
+        },
+        {
+          "id": "unlock_desk",
+          "label": "Unlock the desk drawer",
+          "visible_if_flags": ["look_desk"],
+          "visible_if_items": ["rusty_key"],
+          "once": true,
+          "effects": [{ "add_flag": "desk_unlocked" }],
+          "text": "The rusty key turns with a scrape. The drawer slides open."
+        },  
+        {
+          "id": "read_note",
+          "label": "Read the folded note",
+          "visible_if_flags": ["desk_unlocked"],
+          "once": true,
+          "effects": [{ "add_flag": "read_note" }],
+          "text": "“Oil without flame, flame without oil—useless alone. Light the way where boards give way.”"
+        },
+        {
+          "id": "read_poster",
+          "label": "Read the poster on the wall",
+          "visible_if_not_flags": ["poster_taken"],
+          "once": false,
+          "effects": [
+            { "add_flag": "read_rules" }
+          ],
+          "text": "HOUSE RULES:\n• Use LOOK to spot details and reveal actions.\n• Some actions appear only after you LOOK.\n• Items can be combined (e.g., oil + lantern).\n• Hazards exist; choose carefully.\n• Your goal is to escape by unlocking the front door."
+        },
+        {
+          "id": "take_poster",
+          "label": "Take the poster",
+          "visible_if_not_flags": ["poster_taken"],
+          "visible_if_not_items": ["poster_rules"],
+          "once": true,
+          "effects": [
+            { "add_item": "poster_rules" },
+            { "add_flag": "poster_taken" },
+            { "add_flag": "read_note" }    
+          ],
+          "text": "You ease the tacks out and roll the poster carefully."
+        },
+        {
+          "id": "examine_wall_marks",
+          "label": "Examine the wall where the poster hung",
+          "visible_if_flags": ["poster_taken"],
+          "visible_if_not_flags": ["saw_wall_marks"],
+          "once": true,
+          "effects": [
+            { "add_flag": "saw_wall_marks" }
+          ],
+          "text": "Behind where the poster hung, faint horizontal scratches mark the wall—groups of five, crossed through after seven. Someone was counting days."
+        },
+        {
+          "id": "read_envelope",
+          "label": "Open the sealed envelope in the desk",
+          "visible_if_flags": ["desk_unlocked"],
+          "visible_if_not_flags": ["read_envelope"],
+          "once": true,
+          "effects": [
+            { "add_flag": "read_envelope" }
+          ],
+          "text": "The envelope is addressed but never sent. Inside, a typed letter reads:\n\n“Dr. R. Hale,\n\nYour request for extended isolation is under review. Any further ‘environmental manipulations’ must be documented. Recent reports from neighbors are… concerning.\n\nRespond immediately.”"
+        },
+        {
+          "id": "use_brass_key_on_door",
+          "label": "Use the brass key on the front door",
+          "visible_if_items": ["final_escape_key"],
+          "visible_if_not_flags": ["front_door_unlocked"],
+          "once": true,
+          "effects": [
+            { "remove_item": "final_escape_key" },
+            { "add_flag": "front_door_unlocked" },
+            { "add_flag": "front_door_opened" }
+          ],
+          "text": "You work the brass key into the swollen lock. With a stiff turn, the bolt gives and the door pulls free of the frame."
+        }
+      ]
+    },
+    "2": {
+      "id": "2",
+      "name": "Basement",
+      "desc_short": "A cool, dim basement. From the shadows, faint panting.",
+      "desc_long": "Concrete walls bead with moisture. Shelves sag under paint cans and jars. There is an oil flask here. Something breathes softly from the dark corner.",
+      "on_look_add_flags":  ["saw_oil_flask", "saw_dog"],
+      "exits": {
+        "up": {
+          "to": "1",
+          "label": "to the living room"
+        }
+      },
+      "interactions": [
+        {
+          "id": "take_oil",
+          "label": "Take the oil flask",
+          "visible_if_flags": [
+            "saw_oil_flask"
+          ],
+          "visible_if_not_items": [
+            "oil_flask"
+          ],
+          "once": true,
+          "effects": [
+            {
+              "add_item": "oil_flask"
+            }
+          ],
+          "text": "You feel around behind the jars and pull out a small flask of lamp oil."
+        },
+        {
+          "id": "reach_panting",
+          "label": "Reach toward the panting",
+          "visible_if_not_flags": ["saw_dog"],
+          "once": true,
+          "effects": [
+            {
+              "kill_player": true,
+              "cause": "dog",
+              "message": "You stretch your hand into the dark. The panting rushes at you—heat, teeth, and then nothing."
+            }
+          ],
+          "text": ""
+        },
+        {
+          "id": "pet_dog",
+          "label": "Pet Dog",
+          "visible_if_flags": ["saw_dog"],
+          "once": true,
+          "effects": [
+            {
+              "kill_player": true,
+              "cause": "dog",
+              "message": "You crouch, hand outstretched. The shape in the shadows surges forward and everything ends in white pain."
+            }
+          ],
+          "text": ""
+        },
+        {
+          "id": "read_journal_scrap",
+          "label": "Read the torn journal page on the shelf",
+          "visible_if_flags": ["saw_oil_flask"],
+          "visible_if_not_flags": ["read_journal_scrap"],
+          "once": true,
+          "effects": [
+            { "add_flag": "read_journal_scrap" }
+          ],
+          "text": "Tucked behind the oil flask, a torn page in cramped handwriting:\n\n“Light reveals what darkness distorts. The animals notice first—eyes on corners where we see nothing.”"
+        }
+      ]
+    },
+    "3": {
+      "id": "3",
+      "name": "Front Porch (Outside)",
+      "desc_short": "You’re outside under a cold sky.",
+      "desc_long": "Night air bites at your cheeks. The street is empty; the house looms behind.",
+      "exits": {
+        "south": {
+          "to": "1",
+          "label": "back into the house",
+          "locked": false
+        }
+      },
+      "interactions": [
+        {
+          "id": "win_game",
+          "label": "Step away from the house",
+          "once": true,
+          "effects": [
+            {
+              "add_flag": "game_won"
+            }
+          ],
+          "text": "You step into the night and keep walking. You’ve escaped."
+        }
+      ],
+      "desc_overrides": [
+        {
+          "priority": 20,
+          "visible_if_flags": ["read_lab_note"],
+          "short": "A quiet residential street. The houses line up neatly, but the ivy along the fences seems to lean toward one point behind the house.",
+          "long": "The street looks ordinary at first: cracked asphalt, parked cars, a sagging streetlight. But as you stand here, a pattern nags at you. The ivy that climbs the side fences all seems to bend inward, subtly bowing toward the back of the property you just left—as if something there were tugging at it."
+        }
+      ]
+
+    },
+    "4": {
+      "id": "4",
+      "name": "Backyard",
+      "desc_short": "A patchy lawn hemmed by walls of ivy. A crow watches from the fence.",
+      "desc_long": "Weeds choke the beds. Ivy climbs higher than you can see. Something metal glints in the grass. A black crow perches on the fence, head tilted.",
+      "on_look_add_flags": [
+        "saw_glint"
+      ],
+      "exits": {
+        "east": {
+          "to": "1",
+          "label": "to the living room"
+        },
+        "north": {
+          "to": "7",
+          "label": "to the overgrown shed"
+        }
+      },
+      "interactions": [
+        {
+          "id": "inspect_glint",
+          "label": "Inspect the metal glint",
+          "visible_if_flags": ["saw_glint"],
+          "visible_if_not_flags": ["hatchet_revealed", "hatchet_taken"],
+          "once": true,
+          "effects": [{ "add_flag": "hatchet_revealed" }],
+          "text": "You part the grass and uncover a small hatchet, its edge chipped but sturdy."
+        },
+        {
+          "id": "take_hatchet",
+          "label": "Take the hatchet",
+          "visible_if_flags": ["hatchet_revealed"],
+          "visible_if_not_items": ["hatchet"],
+          "once": true,
+          "effects": [
+            { "add_item": "hatchet" },
+            { "add_flag": "hatchet_taken" }
+          ],
+          "text": "You pick up the hatchet. It has a satisfying heft."
+        },
+        {
+          "id": "approach_crow",
+          "label": "Approach the crow on the fence",
+          "visible_if_not_flags": ["crow_fed"],
+          "once": false,
+          "text": "The crow eyes you, feathers shivering. It seems more interested in food than you."
+        },
+        {
+          "id": "scatter_kernels",
+          "label": "Scatter the corn kernels",
+          "visible_if_items": [
+            "corn_kernels"
+          ],
+          "visible_if_not_flags": [
+            "crow_fed"
+          ],
+          "once": true,
+          "effects": [
+            {
+              "remove_item": "corn_kernels"
+            },
+            {
+              "add_item": "rusty_key"
+            },
+            {
+              "add_flag": "crow_fed"
+            }
+          ],
+          "text": "The crow hops down, gobbles greedily, then drops something metallic at your feet before taking off—you pick up an old rusty key."
+        },
+        {
+          "id": "inspect_ivy",
+          "label": "Inspect the ivy wall",
+          "visible_if_not_flags": ["ivy_inspected"],
+          "once": true,
+          "effects": [
+            { "add_flag": "ivy_inspected" }
+          ],
+          "text": "You push aside the ivy. Beneath the leaves, someone has carved thin intersecting lines—triangles and corridors spiraling inward. The pattern feels almost like a map, but not of anywhere you recognize."
+        },
+        {
+          "id": "look_ivy_wall",
+          "label": "Look at ivy wall",
+          "visible_if_flags": ["ivy_inspected"],
+          "once": false,
+          "effects": [],
+          "text": "The carved lines are still there beneath the leaves—triangles and corridors spiraling inward. It still looks like a map of somewhere that doesn't exist."
+        },
+        {
+          "id": "enter_ivy_opening",
+          "label": "Push through the ivy opening",
+          "visible_if_flags": ["ivy_inspected", "front_door_opened"],
+          "visible_if_not_flags": ["entered_ivy_gate"],
+          "once": true,
+          "effects": [
+            { "add_flag": "entered_ivy_gate" },
+            { "set_room": "20" }
+          ],
+          "text": "You press your weight into the ivy. The stems give way more easily than they should. For a moment the air goes thin and cold, and when you blink you’re standing beyond the wall."
+        }
+      ],
+      "desc_overrides": [
+        {
+          "priority": 30,
+          "visible_if_flags": ["crow_fed", "hatchet_taken"],
+          "short": "A patchy lawn hemmed by ivy. The spot where the hatchet lay is flattened; the fence is empty now.",
+          "long": "Weeds choke the beds; the grass lies bent where you took the hatchet. Ivy climbs higher than you can see. The fence where the crow perched is bare."
+        },
+        {
+          "priority": 25,
+          "visible_if_flags": ["crow_fed", "hatchet_revealed"],
+          "visible_if_not_flags": ["hatchet_taken"],
+          "short": "A patchy lawn hemmed by ivy. A hatchet lies revealed in the grass; the fence is quiet and empty.",
+          "long": "Weeds choke the beds. Ivy climbs higher than you can see. Where the glint was, a hatchet now lies plainly visible. The crow is gone; the fence rail is bare."
+        },
+        {
+          "priority": 20,
+          "visible_if_flags": ["crow_fed"],
+          "visible_if_not_flags": ["hatchet_revealed", "hatchet_taken"],
+          "short": "A patchy lawn hemmed by ivy. The fence stands empty where the crow once watched.",
+          "long": "Weeds choke the beds. Ivy climbs higher than you can see. Something metal glints in the grass. The fence is bare where the crow once watched."
+        },
+        {
+          "priority": 15,
+          "visible_if_flags": ["hatchet_revealed"],
+          "visible_if_not_flags": ["hatchet_taken", "crow_fed"],
+          "short": "A patchy lawn hemmed by ivy. A hatchet lies revealed in the grass; a crow watches from the fence.",
+          "long": "Weeds choke the beds. Ivy climbs higher than you can see. Where the glint was, a hatchet now lies plainly visible. A black crow perches on the fence, head tilted."
+        },
+        {
+          "priority": 10,
+          "visible_if_flags": ["hatchet_taken"],
+          "visible_if_not_flags": ["crow_fed"],
+          "short": "A patchy lawn hemmed by ivy. The spot where the hatchet lay is flattened. A crow watches from the fence.",
+          "long": "Weeds choke the beds; the grass lies bent where you took the hatchet. Ivy climbs higher than you can see. A black crow perches on the fence, head tilted."
+        }
+      ]
+
+    },
+    "5": {
+      "id": "5",
+      "name": "Kitchen",
+      "desc_short": "A narrow kitchen with peeling linoleum.",
+      "on_look_add_flags": ["saw_cupboard"],
+      "desc_long": "The sink is full of gray water. A narrow galley of peeling linoleum. A crooked cupboard door hangs slightly ajar.",
+      "exits": {
+        "north": {
+          "to": "1",
+          "label": "to the living room"
+        }
+      },
+      "interactions": [
+        {
+          "id": "open_cupboard",
+          "label": "Open the crooked cupboard",
+          "visible_if_flags": ["saw_cupboard"],
+          "once": true,
+          "effects": [{ "add_flag": "cupboard_opened" }],
+          "text": "Behind the warped door, an old sack of dried corn kernels sits on the shelf."
+        },
+        {
+          "id": "take_corn",
+          "label": "Take the corn kernels",
+          "visible_if_flags": ["cupboard_opened"],
+          "visible_if_not_items": ["corn_kernels"],
+          "once": true,
+          "effects": [{ "add_item": "corn_kernels" }],
+          "text": "You take a handful of dry kernels."
+        }
+      ],
+      "desc_overrides": [
+        {
+          "visible_if_flags": ["cupboard_opened"],
+          "short": "A narrow kitchen with peeling linoleum and an open cupboard revealing a sack of corn kernels.",
+          "long": "The sink is full of gray water. A narrow galley of peeling linoleum. The crooked cupboard door hangs open, revealing a sack of dried corn kernels on the shelf."
+        }
+      ]
+    },
+    "7": {
+      "id": "7",
+      "name": "Overgrown Shed",
+      "desc_short": "Rusty rakes, a mildewed tarp, and a trapdoor with an iron hasp.",
+      "on_look_add_flags": ["saw_lantern"],
+      "desc_long": "Cobwebs hang like curtains. A square of floorboards is cut out and bound with an iron hasp.",
+      "exits": {
+        "south": { "to": "4", "label": "to the backyard" }
+      },
+      "interactions": [
+      {
+        "id": "take_lantern",
+        "label": "Take the lantern",
+        "visible_if_flags": ["saw_lantern"],
+        "visible_if_not_items": ["lantern", "fueled_lantern"],
+        "once": true,
+        "effects": [{ "add_item": "lantern" }],
+        "text": "You lift the lantern from its nail. The glass is dusty but intact."
+      },
+      {
+        "id": "pry_trapdoor_no_hatchet",
+        "label": "Pry open the trapdoor",
+        "visible_if_not_items": ["hatchet"],
+        "visible_if_not_flags": ["trapdoor_pried"],
+        "sort": -3,
+        "once": false,
+        "text": "You get your fingers under the hasp and strain, but it won’t budge. Without a tool to pry it, the screws don’t give."
+      },
+      {
+        "id": "pry_trapdoor",
+        "label": "Pry open the trapdoor",
+        "visible_if_items": ["hatchet"],
+        "visible_if_not_flags": ["trapdoor_pried"],
+        "once": true,
+        "effects": [{ "add_flag": "trapdoor_pried" }],
+        "text": "You wedge the hatchet under the hasp and lever until the old screws shriek free."
+      },
+
+      {
+        "id": "descend_trapdoor_dark",
+        "label": "Descend through the trapdoor",
+        "visible_if_flags": ["trapdoor_pried"],
+        "visible_if_not_items": ["fueled_lantern"],
+        "sort": -1,
+        "once": false,
+        "text": "You grope along splintered edges—only blackness. You pull back."
+      },
+      {
+        "id": "descend_trapdoor_lit",
+        "label": "Descend through the trapdoor",
+        "visible_if_flags": ["trapdoor_pried"],
+        "visible_if_items": ["fueled_lantern"],
+        "sort": -2,
+        "effects": [{ "set_room": "8" }],
+        "text": "Lantern first, you climb down into the glow and the dust below."
+      },
+      {
+        "id": "read_shed_note",
+        "label": "Read the paper tucked behind the lantern nail",
+        "visible_if_flags": ["saw_lantern"],
+        "visible_if_not_flags": ["read_shed_note"],
+        "once": true,
+        "effects": [
+          { "add_flag": "read_shed_note" }
+        ],
+        "text": "Behind the lantern’s nail, a scrap of graph paper clings to the wood. Someone has sketched a wall of ivy as if seen from above, corridors traced through it in a neat spiral. The lines end in a small, dark square."
+      }
+    ],
+    "desc_overrides": [
+      {
+        "priority": 30,
+        "visible_if_flags": ["trapdoor_pried"],
+        "visible_if_items": ["fueled_lantern"],
+        "short": "Lantern light spills over the open trapdoor.",
+        "long": "In the lantern’s glow, the opening is clear and the ladder rungs below gleam faintly with dust."
+      },
+      {
+        "priority": 25,
+        "visible_if_flags": ["trapdoor_pried"],
+        "visible_if_not_items": ["fueled_lantern"],
+        "short": "An open trapdoor yawns in the floor. Below is only darkness.",
+        "long": "With the hasp pried away, the trapdoor lifts easily. Cool air breathes from the opening, but without light it’s just splinters and black."
+      },
+
+      {
+        "priority": 35,
+        "visible_if_flags": ["saw_lantern"],
+        "visible_if_not_items": ["lantern", "fueled_lantern"],
+        "short": "Rusty rakes, a mildewed tarp, an open trapdoor—and, now that you look, a lantern hangs on a nail.",
+        "long": "Cobwebs hang like curtains. A dusty lantern dangles from a nail above the open trapdoor. A square of floorboards is cut out and bound with an iron hasp."
+      },
+
+      {
+        "priority": 10,
+        "visible_if_items": ["lantern"],
+        "short": "Rusty rakes and a mildewed tarp. Empty tacks mark where a lantern hung. The trapdoor waits.",
+        "long": "Cobwebs hang like curtains. A bare nail shows where the lantern once hung. The trapdoor’s iron hasp looks old."
+      }
+    ]
+
+    },
+    "8": {
+      "id": "8",
+      "name": "Workshop",
+      "desc_short": "A cramped workshop under the shed. A stout chest sits against the wall.",
+      "desc_long": "Pegboard studded with hooks, a bench lined with jars of nails. A heavy wooden chest bears a simple keyhole.",
+      "exits": {
+        "up": {
+          "to": "7",
+          "label": "up to the shed"
+        }
+      },
+      "interactions": [
+        {
+          "id": "examine_chest",
+          "label": "Examine the chest",
+          "visible_if_not_flags": ["chest_examined"],
+          "once": true,
+          "effects": [{ "add_flag": "chest_examined" }],
+          "text": "A stout wooden chest with iron bands. The keyhole is plain and old-fashioned."
+        },
+        {
+          "id": "unlock_chest",
+          "label": "Unlock the chest",
+          "visible_if_items": ["rusty_key"],
+          "visible_if_not_flags": ["chest_opened"],
+          "once": true,
+          "effects": [{ "add_flag": "chest_opened" }],
+          "text": "The lock clicks and the lid groans. Inside lies a single brass house key on a faded ribbon."
+        },
+        {
+          "id": "take_final_key",
+          "label": "Take the brass house key",
+          "visible_if_flags": ["chest_opened"],
+          "visible_if_not_items": ["final_escape_key"],
+          "once": true,
+          "effects": [{ "add_item": "final_escape_key" }],
+          "text": "You pocket the brass house key. It has a reassuring weight."
+        },
+        {
+          "id": "ascend_to_shed",
+          "label": "Climb up through the trapdoor",
+          "sort": -2,
+          "effects": [{ "set_room": "7" }],
+          "text": "You climb the ladder and push the trapdoor open to the shed."
+        },
+        {
+          "id": "read_lab_note",
+          "label": "Read the folded note in the corner",
+          "visible_if_flags": ["chest_opened"],
+          "visible_if_not_flags": ["read_lab_note"],
+          "once": true,
+          "effects": [
+            { "add_flag": "read_lab_note" }
+          ],
+          "text": "A folded note lies half-tucked under the chest. In the same tight handwriting:\n\n“House-scale trial completed. Boundary holds under stress. Next phase: open-air layout, higher complexity. Natural growth should mask the pattern.”"
+        }
+      ]
+    },
+    "20": {
+      "id": "20",
+      "name": "Ivy Gate",
+      "desc_short": "Just beyond the ivy wall, the ground feels a half-step out of place.",
+      "desc_long": "The backyard is on the other side of the ivy, but it doesn’t look quite the same from here. The fence angles feel skewed, the sky a shade too flat. The opening ahead isn’t a gap in plants so much as a corridor cut into green.",
+      "desc_overrides": [
+        {
+          "priority": 10,
+          "visible_if_flags": ["read_lab_note"],
+          "short": "The ivy behind you forms a precise arch; the opening ahead feels deliberately carved.",
+          "long": "With the lab note in mind, the space here feels wrong in a specific way. The ivy walls aren’t random growth—they follow a pattern, edges aligning like someone drafted them on graph paper before they ever sprouted."
+        }
+      ],
+      "interactions": [],
+      "exits": {
+        "south": {
+          "to": "4",
+          "label": "Back toward the yard and house",
+          "locked": false
+        },
+        "north": {
+          "to": "21",
+          "label": "Step into the hedge corridor",
+          "locked": false
+        }
+      }
+    },
+    "21": {
+      "id": "21",
+      "name": "Hedge Corridor",
+      "desc_short": "A narrow corridor of hedge closes in on both sides.",
+      "desc_long": "The hedge rises taller than the house, a dense mass of leaves and branches with no gaps between. The path underfoot is packed earth, faintly scored with shoe prints that don’t all point the same way. When you look back, the arch of ivy you came through is still there… but for a second, you’d swear it wasn’t.",
+      "desc_overrides": [
+        {
+          "priority": 10,
+          "visible_if_flags": ["ivy_inspected"],
+          "short": "The corridor twists just slightly more than feels natural.",
+          "long": "Up close, the hedge doesn’t smell like any plant you recognize. The angles of the corridor are off by a few degrees, and when you trace the lines in your head, they echo the carved pattern you saw under the ivy in the yard."
+        }
+      ],
+      "interactions": [],
+      "exits": {
+        "south": {
+          "to": "20",
+          "label": "Back to the ivy arch",
+          "locked": false
+        }
+      }
+    }
+  }
+}
