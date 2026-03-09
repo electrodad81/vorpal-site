@@ -30,9 +30,9 @@ from datetime import datetime
 from pathlib import Path
 
 # Default paths — adjust if your repos are elsewhere
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_DATA_PATH = PROJECT_ROOT / "out" / "product_hub_data.json"
-DEFAULT_SITE_REPO = Path.home() / "vorpal-site"
+PROJECT_ROOT = Path(__file__).resolve().parent
+DEFAULT_DATA_PATH = PROJECT_ROOT / "product_hub_data.json"
+DEFAULT_SITE_REPO = PROJECT_ROOT
 
 # Brand display names: slug -> label
 BRAND_DISPLAY = {
@@ -104,15 +104,17 @@ def build_filter_buttons(products: list) -> str:
 
 
 def escape_js_string(s: str) -> str:
-    """Escape a string for safe embedding in a JS object literal."""
+    """Escape a string for safe embedding in a JS double-quoted string literal."""
     if not s:
         return ""
     return (
         s.replace("\\", "\\\\")
         .replace('"', '\\"')
-        .replace("'", "\\'")
         .replace("\n", "\\n")
         .replace("\r", "")
+        .replace("\u2028", "\\u2028")
+        .replace("\u2029", "\\u2029")
+        .replace("</", "<\\/")
     )
 
 
