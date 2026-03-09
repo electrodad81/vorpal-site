@@ -693,8 +693,14 @@ def build_html(products):
 </html>'''
 
 
+def sort_key(p):
+    """Sort by date_published > date_uploaded > date_added, newest first."""
+    return p.get("date_published") or p.get("date_uploaded") or p.get("date_added") or ""
+
+
 def main():
     products = load_products()
+    products.sort(key=sort_key, reverse=True)
     html = build_html(products)
     os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
