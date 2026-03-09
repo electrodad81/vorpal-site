@@ -400,6 +400,37 @@
             fill: currentColor;
         }
 
+        .btn-watch {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-accent);
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-family: var(--font-display);
+            font-size: 0.8rem;
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 0.55rem 1rem;
+            border-radius: 6px;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .btn-watch:hover {
+            border-color: var(--accent-vorpal);
+            color: var(--text-primary);
+            background: var(--accent-vorpal-glow);
+        }
+
+        .btn-watch svg {
+            width: 14px;
+            height: 14px;
+            fill: currentColor;
+        }
+
         /* === FOOTER === */
         .site-footer {
             border-top: 1px solid var(--border-subtle);
@@ -543,17 +574,21 @@
         }
 
         grid.innerHTML = filtered.map(p => {
-            // Media: video embed > product image > coming soon
+            // Media: product image > coming soon
             let mediaContent;
-            if (p.video_id) {
-                mediaContent = `
-                    <iframe src="https://www.youtube.com/embed/${p.video_id}" loading="lazy" allowfullscreen></iframe>
-                    <span class="media-badge">Watch Review</span>`;
-            } else if (p.image_url) {
+            if (p.image_url) {
                 mediaContent = `<img src="${p.image_url}" alt="${p.title}" loading="lazy">`;
             } else {
                 mediaContent = `<div class="coming-soon">Coming soon</div>`;
             }
+
+            // Watch Review button (links to YouTube)
+            const watchBtn = p.video_id
+                ? `<a href="https://www.youtube.com/watch?v=${p.video_id}" target="_blank" rel="noopener" class="btn-watch">
+                    <svg viewBox="0 0 24 24"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.5 31.5 0 0 0 0 12a31.5 31.5 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.5 31.5 0 0 0 24 12a31.5 31.5 0 0 0-.5-5.8zM9.6 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg>
+                    Watch Review
+                </a>`
+                : ``;
 
             // Price display - show only if populated
             const priceDisplay = p.price
@@ -578,6 +613,7 @@
                         <p class="card-desc">${p.description}</p>
                         <div class="card-footer">
                             ${priceDisplay}
+                            ${watchBtn}
                             ${p.vorpal_url
                                 ? `<a href="${p.vorpal_url}" target="_blank" rel="noopener" class="btn-vorpal">
                                     <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM7.2 14.8l.1-.2L8.1 13h7.5c.7 0 1.4-.4 1.7-1l3.9-7-1.7-1-3.9 7H8.5L4.3 2H1v2h2l3.6 7.6L5.2 14c-.1.3-.2.6-.2 1 0 1.1.9 2 2 2h12v-2H7.4c-.1 0-.2-.1-.2-.2z"/></svg>
