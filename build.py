@@ -730,8 +730,12 @@ def build_html(products):
 
 
 def sort_key(p):
-    """Sort by date_published > date_uploaded > date_added, newest first."""
-    return p.get("date_published") or p.get("date_uploaded") or p.get("date_added") or ""
+    """Sort by date_published, then date_uploaded, then date_added (newest first)."""
+    return (
+        p.get("date_published") or "",
+        p.get("date_uploaded") or "",
+        p.get("date_added") or "",
+    )
 
 
 def main():
