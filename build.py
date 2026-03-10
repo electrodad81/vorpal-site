@@ -78,6 +78,7 @@ def build_html(products):
       gtag('js', new Date());
       gtag('config', '{GA4_ID}');
     </script>
+    <meta name='impact-site-verification' value='f5c4f094-29b6-464e-9c51-4e6538cdb504'>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vorpal Collectibles</title>
